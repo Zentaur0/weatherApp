@@ -13,9 +13,9 @@ final class CityCell: UITableViewCell {
     static let reuseIdentifier = "CityCell"
 
     // MARK: - Properties
-    private let citiName = UILabel()
-    private let temperature = UILabel()
-    private let humidity = UILabel()
+    private let nameLabel = UILabel()
+    private let temperatureLabel = UILabel()
+    private let humidityLabel = UILabel()
     private let informationStack = UIStackView()
 
     // MARK: - Init
@@ -35,20 +35,20 @@ final class CityCell: UITableViewCell {
 // MARK: - Methods
 extension CityCell {
     private func setupCell() {
-        informationStack.addArrangedSubview(temperature)
-        informationStack.addArrangedSubview(humidity)
+        informationStack.addArrangedSubview(temperatureLabel)
+        informationStack.addArrangedSubview(humidityLabel)
         informationStack.spacing = 4
 
-        contentView.addSubview(citiName)
+        contentView.addSubview(nameLabel)
         contentView.addSubview(informationStack)
     }
 
     private func setupConstraints() {
-        citiName.translatesAutoresizingMaskIntoConstraints = false
+        nameLabel.translatesAutoresizingMaskIntoConstraints = false
         informationStack.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            citiName.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            citiName.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            nameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
 
             informationStack.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             informationStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15),
@@ -57,9 +57,9 @@ extension CityCell {
     }
 
     internal func build(city: City) {
-        citiName.text = city.name
-        temperature.text = String(city.temp)  + "C"
-        humidity.text = String(city.humidity) + "H"
+        nameLabel.text = city.name
+        temperatureLabel.text = String(city.temp)  + "C"
+        humidityLabel.text = String(city.humidity) + "H"
     }
 
 }
