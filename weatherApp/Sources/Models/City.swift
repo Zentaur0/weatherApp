@@ -9,7 +9,7 @@ import UIKit
 import SwiftyJSON
 
 // MARK: - City
-struct City: Decodable {
+struct City: Codable {
     // MARK: - Properties
     /// City temperature
     let temp: Double

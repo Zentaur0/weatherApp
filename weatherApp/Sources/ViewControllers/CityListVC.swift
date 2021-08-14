@@ -15,10 +15,12 @@ final class CityListVC: UIViewController {
     private var filteredCities: [City] = []
     private let searchController = UISearchController(searchResultsController: nil)
     private let tableView = UITableView()
+    private let savedCitiesKey = "saved_cities"
 
     // MARK: - Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        checkSavedCities()
         configureView()
         setupConstraints()
     }
@@ -82,6 +84,26 @@ extension CityListVC {
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
     }
+
+    private func checkSavedCities() {
+        guard let data = UserDefaults.standard.data(forKey: savedCitiesKey) else { return }
+        guard let cities = try? JSONDecoder().decode([City].self, from: data) else { return }
+
+        for city in cities {
+            WeatherService.shared.getData(cityName: city.name) { [weak self] result in
+                switch result {
+                case .failure(let error):
+                    self?.showErrorAlert(error)
+                case .success(let city):
+                    self?.filteredCities.append(city)
+                    self?.cities.append(city)
+                    DispatchQueue.main.async { [weak self] in
+                        self?.tableView.reloadData()
+                    }
+                }
+            }
+        }
+    }
 }
 
 // MARK: - Actions
@@ -97,6 +119,9 @@ extension CityListVC {
                         case .success(let city):
                             if city.name != "" {
                                 self?.cities.append(city)
+                                if let data = try? JSONEncoder().encode(self?.cities) {
+                                    UserDefaults.standard.set(data, forKey: self?.savedCitiesKey ?? "")
+                                }
                             } else {
                                 self?.showAlert()
                             }
@@ -185,7 +210,13 @@ extension CityListVC: UITableViewDelegate {
                    commit editingStyle: UITableViewCell.EditingStyle,
                    forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
+            tableView.beginUpdates()
             filteredCities.remove(at: indexPath.item)
+
+            guard let data = try? JSONEncoder().encode(filteredCities) else { return }
+            UserDefaults.standard.set(data, forKey: savedCitiesKey)
+
+            tableView.endUpdates()
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
